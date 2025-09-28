@@ -2,6 +2,7 @@ import express from "express";
 import { env } from "./config/env.js";
 import { db } from "./config/db.js";
 import { favouritesTable } from "./db/schema.js";
+import { cronJob } from "./config/cron.js";
 
 const PORT = env.PORT;
 const app = express();
@@ -11,6 +12,10 @@ app.use(express.json());
 app.get("/api/v1/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is running" });
 });
+
+if(env.NODE_ENV === "production") {
+  cronJob.start();
+}
 
 app.post("/api/v1/favourites", async (req, res) => {
   try {
