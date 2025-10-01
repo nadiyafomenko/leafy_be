@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { clerkMiddleware, requireAuth } from "@clerk/express";
 import { and, eq } from "drizzle-orm";
+import { migrate } from "drizzle-orm/neon-http/migrator";
 import { env } from "./config/env.js";
 import { db } from "./config/db.js";
 import { favouritesTable, profilesTable } from "./db/schema.js";
@@ -20,6 +21,14 @@ app.get("/api/v1/health", (req, res) => {
 
 if(env.NODE_ENV === "production") {
   cronJob.start();
+}
+
+// Ensure DB migrations are applied on startup (idempotent)
+try {
+  await migrate(db, { migrationsFolder: "./src/db/migrations" });
+  console.log("Database migrations applied");
+} catch (e) {
+  console.error("Database migration failed", e);
 }
 
 app.post("/api/v1/favourites", requireAuth(), async (req, res) => {
