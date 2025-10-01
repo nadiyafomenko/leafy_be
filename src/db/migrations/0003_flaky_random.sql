@@ -1,0 +1,22 @@
+CREATE TABLE "books" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL,
+	"book_id" uuid NOT NULL,
+	"genres" jsonb,
+	"title" text NOT NULL,
+	"author" text NOT NULL,
+	"description" text NOT NULL,
+	"image_url" text NOT NULL,
+	"link" text NOT NULL,
+	"rating" numeric NOT NULL,
+	"reviews" text NOT NULL,
+	"tags" jsonb,
+	"published_at" timestamp NOT NULL,
+	"pages" integer NOT NULL,
+	"language" text NOT NULL,
+	"publisher" text NOT NULL,
+	"category" text NOT NULL,
+	"sub_category" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
