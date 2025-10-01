@@ -1,4 +1,4 @@
-import { pgTable, timestamp, uuid, text, jsonb, array, numeric , integer} from "drizzle-orm/pg-core";
+import { pgTable, timestamp, uuid, text, jsonb, numeric , integer} from "drizzle-orm/pg-core";
 
 export const favouritesTable = pgTable("favourites", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -19,23 +19,22 @@ export const profilesTable = pgTable("profiles", {
 
 export const booksTable = pgTable("books", {
   id: uuid("id").defaultRandom().primaryKey(),
-  userId: text("user_id").notNull(),
-  bookId: uuid("book_id").notNull(),
+  bookId: uuid("book_id"),
   genres: jsonb("genres"),
   title: text("title").notNull(),
   author: text("author").notNull(),
-  description: text("description").notNull(),
-  imageUrl: text("image_url").notNull(),
-  link: text("link").notNull(),
-  rating: numeric("rating").notNull(),
-  reviews: text("reviews").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  link: text("link"),
+  rating: numeric("rating"),
+  reviews: text("reviews"),
   tags: jsonb("tags"),
-  publishedAt: timestamp("published_at").notNull(),
-  pages: integer("pages").notNull(),
-  language: text("language").notNull(),
-  publisher: text("publisher").notNull(),
-  category: text("category").notNull(),
-  subCategory: text("sub_category").notNull(),
+  publishedAt: timestamp("published_at"),
+  pages: integer("pages"),
+  language: text("language"),
+  publisher: text("publisher"),
+  category: text("category"),
+  subCategory: text("sub_category"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

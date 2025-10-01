@@ -6,6 +6,7 @@ import { cronJob } from "./config/cron.js";
 import healthRoutes from "./routes/healthRoutes.js";
 import favouritesRoutes from "./routes/favouritesRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import booksRoutes from "./routes/booksRoutes.js";
 
 const PORT = env.PORT;
 const app = express();
@@ -24,6 +25,8 @@ app.use("/api/v1", healthRoutes);
 app.use("/api/v1", favouritesRoutes);
 
 app.use("/api/v1", profileRoutes);
+
+app.use("/api/v1", booksRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1759062424526,
-      "tag": "0000_gorgeous_toxin",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1759063322677,
-      "tag": "0001_yellow_silver_sable",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1759312970079,
-      "tag": "0002_sleepy_pestilence",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1759314536255,
-      "tag": "0003_flaky_random",
+      "when": 1759316885124,
+      "tag": "0000_purple_mandroid",
       "breakpoints": true
     }
   ]
