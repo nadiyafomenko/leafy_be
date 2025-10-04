@@ -15,6 +15,20 @@
       "when": 1759340355559,
       "tag": "0001_minor_doorman",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1759349999999,
+      "tag": "0002_profile_extra_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1759577074522,
+      "tag": "0003_tranquil_fallen_one",
+      "breakpoints": true
     }
   ]
 }

@@ -1,4 +1,4 @@
-import { pgTable, timestamp, uuid, text, jsonb, numeric , integer} from "drizzle-orm/pg-core";
+import { pgTable, timestamp, uuid, text, jsonb, numeric , integer, date } from "drizzle-orm/pg-core";
 
 export const favouritesTable = pgTable("favourites", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -13,6 +13,9 @@ export const profilesTable = pgTable("profiles", {
   username: text("username").unique(),
   avatarUrl: text("avatar_url"),
   genres: jsonb("genres"),
+  dateOfBirth: date("date_of_birth"),
+  language: text("language"),
+  region: text("region"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
