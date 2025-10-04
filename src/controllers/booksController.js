@@ -1,7 +1,7 @@
 import { getBooks as getBooksService, getBook as getBookService } from "../services/booksService.js";
 import { db } from "../config/db.js";
 import { genresCatalogTable } from "../db/schema.js";
-import { sql } from "drizzle-orm";
+import { asc } from "drizzle-orm";
 
 export async function getBooks(req, res) {
   try {
@@ -24,7 +24,8 @@ export async function getBook(req, res) {
 
 export async function getGenres(req, res) {
   try {
-    const rows = await db.select().from(genresCatalogTable).orderBy(sql`lower(${genresCatalogTable.name})`);
+    const rows = await db.select().from(genresCatalogTable).orderBy(asc(genresCatalogTable.name));
+    console.log("GET /api/v1/genres rows", rows);
     res.status(200).json({ success: true, data: rows });
   } catch (error) {
     console.error("GET /api/v1/genres error", error);
