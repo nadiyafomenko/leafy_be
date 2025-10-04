@@ -21,4 +21,9 @@ export async function upsertProfile(clerkId, updateData) {
   return rows[0];
 }
 
+export async function createProfile(clerkId) {
+  const inserted = await db.insert(profilesTable).values({ clerkId }).returning();
+  return inserted[0];
+}
+
 

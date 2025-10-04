@@ -11,7 +11,8 @@
     "start": "node ./src/server.js",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "seed:openlibrary": "node ./src/scripts/openLibraryScript.js"
+    "seed:openlibrary": "node ./src/scripts/openLibraryScript.js",
+    "backfill:genres": "node -e \"(async()=>{const {db}=await import('./src/config/db.js'); const {booksTable,genresCatalogTable}=await import('./src/db/schema.js'); const {backfillGenresCatalog}=await import('./src/scripts/openLibraryScript.js'); const res=await backfillGenresCatalog(db,{booksTable,genresCatalogTable}); console.log('Inserted genres:',res.inserted);})().catch(e=>{console.error(e); process.exit(1);})\""
   },
   "dependencies": {
     "@clerk/express": "^1.7.35",

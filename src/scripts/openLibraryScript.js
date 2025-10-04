@@ -43,6 +43,54 @@ function buildLinkFromKey(key) {
   return `${OPEN_LIBRARY_BASE_URL}${key}`;
 }
 
+function isLikelyUkrainianTitle(title) {
+  if (!title || typeof title !== "string") return false;
+  const normalized = title.trim();
+  if (normalized.length === 0) return false;
+  // Prefer titles that include Ukrainian-specific characters
+  const hasUkrainianSpecificChars = /[ґҐєЄіІїЇ]/.test(normalized);
+  if (hasUkrainianSpecificChars) return true;
+  // Fallback: allow Cyrillic if language is already filtered to ukr
+  const hasCyrillic = /[\u0400-\u04FF]/.test(normalized);
+  return hasCyrillic;
+}
+
+function docHasCover(doc) {
+  return Boolean(doc && doc.cover_i);
+}
+
+function docIsUkrainian(doc) {
+  return Array.isArray(doc?.language) && doc.language.includes("ukr");
+}
+
+function filterDocsForUkrainianCoverAndTitle(docs) {
+  if (!Array.isArray(docs)) return [];
+  return docs.filter((doc) => docIsUkrainian(doc) && docHasCover(doc) && isLikelyUkrainianTitle(doc.title));
+}
+
+export async function backfillGenresCatalog(db, tables) {
+  const { booksTable, genresCatalogTable } = tables;
+
+  // Read all distinct genre strings from books.genres (jsonb array)
+  const rows = await db.select({ genres: booksTable.genres }).from(booksTable);
+  const unique = new Set();
+  for (const row of rows) {
+    const g = row.genres;
+    if (Array.isArray(g)) {
+      for (const name of g) {
+        if (typeof name === "string" && name.trim().length > 0) {
+          unique.add(name.trim());
+        }
+      }
+    }
+  }
+  if (unique.size === 0) return { inserted: 0 };
+
+  const values = Array.from(unique).map((name) => ({ name }));
+  await db.insert(genresCatalogTable).values(values);
+  return { inserted: values.length };
+}
+
 function buildSearchUrl({ strategy, page, limit }) {
   const url = new URL(`${OPEN_LIBRARY_BASE_URL}/search.json`);
   url.searchParams.set("page", String(page));
@@ -196,18 +244,18 @@ async function main() {
     try {
       const data = await fetchUkrainianWorksPage(chosenStrategy, page, pageSize);
       const docs = Array.isArray(data.docs) ? data.docs : [];
+      const filteredDocs = filterDocsForUkrainianCoverAndTitle(docs);
 
-      console.log("docs", docs);
       if (docs.length === 0) {
         break;
       }
 
-      const { inserted, skipped } = await upsertBooks(docs);
+      const { inserted, skipped } = await upsertBooks(filteredDocs);
       totalInserted += inserted;
       totalSkipped += skipped;
 
       console.log(
-        `Processed page ${page} (docs=${docs.length}) -> inserted=${inserted}, skipped=${skipped} (totalInserted=${totalInserted}, totalSkipped=${totalSkipped})`
+        `Processed page ${page} (docs=${docs.length}, filtered=${filteredDocs.length}) -> inserted=${inserted}, skipped=${skipped} (totalInserted=${totalInserted}, totalSkipped=${totalSkipped})`
       );
 
       page += 1;
@@ -221,6 +269,16 @@ async function main() {
   }
 
   console.log(`OpenLibrary seed complete. Inserted=${totalInserted}, Skipped=${totalSkipped}`);
+
+  // Optional: backfill genres catalog after seeding
+  try {
+    const { db } = await import("../config/db.js");
+    const { booksTable, genresCatalogTable } = await import("../db/schema.js");
+    const { inserted } = await backfillGenresCatalog(db, { booksTable, genresCatalogTable });
+    console.log(`Genres catalog backfill complete. Inserted=${inserted}`);
+  } catch (e) {
+    console.warn("Genres catalog backfill skipped:", e?.message || e);
+  }
 }
 
 // Allow running directly via npm script

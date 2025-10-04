@@ -1,4 +1,4 @@
-import { getOrCreateProfileByClerkId, upsertProfile } from "../services/profileService.js";
+import { getOrCreateProfileByClerkId, upsertProfile, createProfile } from "../services/profileService.js";
 
 export async function getMe(req, res) {
   try {
@@ -36,4 +36,15 @@ export async function updateMe(req, res) {
   }
 }
 
+export async function createMe(req, res) {
+  try {
+    const clerkId = req.auth?.userId;
+    if(!clerkId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
+    const profile = await createProfile(clerkId);
+    res.status(200).json({ success: true, data: profile });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}

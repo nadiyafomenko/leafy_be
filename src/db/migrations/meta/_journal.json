@@ -8,6 +8,13 @@
       "when": 1759316885124,
       "tag": "0000_purple_mandroid",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1759340355559,
+      "tag": "0001_minor_doorman",
+      "breakpoints": true
     }
   ]
 }
