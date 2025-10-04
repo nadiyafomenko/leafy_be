@@ -1,3 +1,9 @@
-ALTER TABLE "profiles" ADD COLUMN "date_of_birth" date;--> statement-breakpoint
-ALTER TABLE "profiles" ADD COLUMN "language" text;--> statement-breakpoint
-ALTER TABLE "profiles" ADD COLUMN "region" text;
+DO $$ BEGIN
+  ALTER TABLE "profiles" ADD COLUMN "date_of_birth" date;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "profiles" ADD COLUMN "language" text;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;--> statement-breakpoint
+DO $$ BEGIN
+  ALTER TABLE "profiles" ADD COLUMN "region" text;
+EXCEPTION WHEN duplicate_column THEN NULL; END $$;
