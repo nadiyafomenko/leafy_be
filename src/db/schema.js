@@ -16,6 +16,7 @@ export const profilesTable = pgTable("profiles", {
   dateOfBirth: date("date_of_birth"),
   language: text("language"),
   region: text("region"),
+  favoriteAuthors: jsonb("favorite_authors"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
