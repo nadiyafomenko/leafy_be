@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, ne } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { booksTable, favouritesTable, profilesTable } from "../db/schema.js";
 import { rerankWithLLM } from "./llmService.js";
@@ -57,7 +57,27 @@ export async function getDiscoverFeed({ clerkId, limit = 20, cursor }) {
     .orderBy(desc(booksTable.rating), desc(booksTable.publishedAt))
     .limit(topK);
 
-  const rawCandidates = rows.filter(r => !excludeIds.has(r.id)).map(toCompact);
+  let rawCandidates = rows.filter(r => !excludeIds.has(r.id)).map(toCompact);
+
+  // Fallback: if no candidates with language filter, relax filters
+  if(rawCandidates.length === 0) {
+    const relaxedRows = await db
+      .select()
+      .from(booksTable)
+      .orderBy(desc(booksTable.rating), desc(booksTable.publishedAt))
+      .limit(topK);
+    rawCandidates = relaxedRows.filter(r => !excludeIds.has(r.id)).map(toCompact);
+  }
+
+  // Fallback #2: if still empty, return latest any books
+  if(rawCandidates.length === 0) {
+    const latestRows = await db
+      .select()
+      .from(booksTable)
+      .orderBy(desc(booksTable.publishedAt))
+      .limit(Math.max(limit, 20));
+    rawCandidates = latestRows.map(toCompact);
+  }
 
   // 4) LLM rerank limited set
   const candidateSlice = rawCandidates.slice(0, 150);
@@ -78,7 +98,17 @@ export async function getDiscoverFeed({ clerkId, limit = 20, cursor }) {
   const window = merged.slice(startIndex, startIndex + limit);
   const nextCursor = encodeCursor(window[window.length - 1]);
 
-  return { items: window, nextCursor };
+  // Load full book objects for client shape compatibility
+  const ids = window.map(w => w.id);
+  if(ids.length === 0) return { items: [], nextCursor: null };
+  const fullRows = await db.select().from(booksTable).where(inArray(booksTable.id, ids));
+  const byId = new Map(fullRows.map(r => [String(r.id), r]));
+  const items = ids
+    .map(id => byId.get(String(id)))
+    .filter(Boolean)
+    .map(row => ({ ...row }));
+
+  return { items, nextCursor };
 }
 
 

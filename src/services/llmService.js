@@ -34,6 +34,8 @@ export async function rerankWithLLM(profile, candidates) {
   if(!env.OPENAI_API_KEY || !candidates?.length) return candidates.map(c => ({ id: c.id, score: 0.5 }));
 
   const prompt = buildPrompt(profile, candidates);
+
+  console.log('prompt', prompt);
   try {
     const chat = await client.chat.completions.create({
       model: "gpt-5-nano",
