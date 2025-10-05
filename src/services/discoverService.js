@@ -38,6 +38,7 @@ export async function getDiscoverFeed({ clerkId, limit = 20, cursor }) {
   const profileRows = await db.select().from(profilesTable).where(eq(profilesTable.clerkId, clerkId));
   const profile = profileRows?.[0] || {};
 
+  console.log('profile', profile);
   // 2) Exclude favourites (as an example of seen items)
   const favs = await db.select().from(favouritesTable).where(eq(favouritesTable.userId, clerkId));
   const excludeIds = new Set(favs.map(f => f.bookId));

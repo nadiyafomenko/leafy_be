@@ -44,6 +44,7 @@ export async function rerankWithLLM(profile, candidates) {
       temperature: 0.2,
     });
     const text = chat.choices?.[0]?.message?.content?.trim() || "";
+    console.log('text', text);
     const jsonStart = text.indexOf("{");
     const jsonEnd = text.lastIndexOf("}") + 1;
     const body = JSON.parse(text.slice(jsonStart, jsonEnd));
